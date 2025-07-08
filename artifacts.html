@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>原神 聖遺物スコアチェッカー</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <h1>原神 聖遺物スコアチェッカー</h1>
+
+  <label>メインステータス:
+    <select id="mainStat"></select>
+  </label>
+
+  <label>数値 (Lv20固定):
+    <input type="number" id="mainValue" disabled />
+  </label>
+
+  <label>聖遺物の部位:
+    <select id="artifactType"></select>
+  </label>
+</body>
+
+</html>
+
+
+</select>
+
+
+</div>
+
+<div class="compact-row">
+  <label for="noCompoundStat">参照スコア:</label>
+  <select id="noCompoundStat">
+    <option value="">なし</option>
+    <option value="atk">攻撃力%</option>
+    <option value="hp">HP%</option>
+    <option value="def">防御力%</option>
+    <option value="em">元素熟知</option>
+    <option value="er">元素チャージ効率</option>
+  </select>
+</div>
+
+<h2>サブステータス</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ステータス名</th>
+      <th>スコア候補（全値）</th>
+    </tr>
+  </thead>
+  <tbody id="subStatTableBody"></tbody>
+</table>
+
+<button onclick="calculateScore()">スコア計算</button>
+<div id="result">スコア: -</div>
+
+<script>
+  const lv20MainValues = {
+    flower: { hpFlat: 4780 },
+    plume: { atkFlat: 311 },
+    sands: { atk: 46.6, hp: 46.6, def: 58.3, er: 51.8 },
+    goblet: {
+      atk: 46.6, hp: 46.6, def: 58.3, em: 187,
+      pyro: 46.6, hydro: 46.6, cryo: 46.6, electro: 46.6,
+      anemo: 46.6, geo: 46.6, dendro: 46.6
+    },
+    circlet: {
+      atk: 46.6, hp: 46.6, def: 58.3,
+      critRate: 31.1, critDmg: 62.2, heal: 35.9
+    }
+  };
+
+  const mainStatsOptions = {
+    flower: [{ value: 'hpFlat', label: 'HP (実数固定)' }],
+    plume: [{ value: 'atkFlat', label: '攻撃力 (実数固定)' }],
+    sands: [
+      { value: 'atk', label: '攻撃力%' },
+      { value: 'hp', label: 'HP%' },
+      { value: 'def', label: '防御力%' },
+      { value: 'er', label: '元素チャージ効率' }
+    ],
+    goblet: [
+      { value: 'atk', label: '攻撃力%' },
+      { value: 'hp', label: 'HP%' },
+      { value: 'def', label: '防御力%' },
+      { value: 'em', label: '元素熟知' },
+      { value: 'pyro', label: '炎ダメージ%' },
+      { value: 'hydro', label: '水ダメージ%' },
+      { value: 'cryo', label: '氷ダメージ%' },
+      { value: 'electro', label: '雷ダメージ%' },
+      { value: 'anemo', label: '風ダメージ%' },
+      { value: 'geo', label: '岩ダメージ%' },
+      { value: 'dendro', label: '草ダメージ%' }
+    ],
+    circlet: [
+      { value: 'atk', label: '攻撃力%' },
+      { value: 'hp', label: 'HP%' },
+      { value: 'def', label: '防御力%' },
+      { value: 'critRate', label: '会心率' },
+      { value: 'critDmg', label: '会心ダメージ' },
+      { value: 'heal', label: '治療効果%' }
+    ]
+  };
+
+  const subStats = [
+    { value: '', label: '選択しない' },
+    { value: 'critRate', label: '会心率' },
+    { value: 'critDmg', label: '会心ダメージ' },
+    { value: 'atk', label: '攻撃力%' },
+    { value: 'hp', label: 'HP%' },
+    { value: 'def', label: '防御力%' },
+    { value: 'em', label: '元素熟知' },
+    { value: 'er', label: '元素チャージ効率' }
+  ];
+
+  const rollValuesTable = {
+    critRate: [2.7, 3.1, 3.5, 3.9],
+    critDmg: [5.4, 6.2, 7.0, 7.8],
+    atk: [4.1, 4.7, 5.2, 5.8],
+    hp: [4.1, 4.7, 5.2, 5.8],
+    def: [5.1, 6.0, 6.6, 7.3],
+    em: [16.3, 18.7, 21.0, 23.3],
+    er: [4.5, 5.2, 5.8, 6.5]
+  };
+
+  function updateMainStatOptions() {
+    const artifactType = document.getElementById('artifactType').value;
+    const statSelect = document.getElementById('mainStat');
+    statSelect.innerHTML = '';
+
+    const options = mainStatsOptions[artifactType];
+    options.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.label;
+      statSelect.appendChild(option);
+    });
+
+    updateMainValue();
+  }
+
+  function updateMainValue() {
+    const type = document.getElementById('artifactType').value;
+    const stat = document.getElementById('mainStat').value;
+    const mainValue = document.getElementById('mainValue');
+
+    if (lv20MainValues[type] && lv20MainValues[type][stat] !== undefined) {
+      mainValue.value = lv20MainValues[type][stat];
+    } else {
+      mainValue.value = '';
+    }
+  }
+
+  function setupSubStatRows() {
+    const tbody = document.getElementById('subStatTableBody');
+    tbody.innerHTML = '';
+
+    for (let i = 1; i <= 4; i++) {
+      const tr = document.createElement('tr');
+
+      const td1 = document.createElement('td');
+      const statSelect = document.createElement('select');
+      statSelect.id = `stat${i}`;
+      td1.appendChild(statSelect);
+
+      const td2 = document.createElement('td');
+      const scoreSelect = document.createElement('select');
+      scoreSelect.id = `score${i}`;
+      td2.appendChild(scoreSelect);
+
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tbody.appendChild(tr);
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById(`stat${i}`).addEventListener('change', () => {
+        updateAllSubStatOptions();
+        updateScoreOptions(i);
+      });
+    }
+
+    updateAllSubStatOptions();
+
+    for (let i = 1; i <= 4; i++) {
+      updateScoreOptions(i);
+    }
+  }
+
+  function updateAllSubStatOptions() {
+    const selectedValues = [];
+    for (let i = 1; i <= 4; i++) {
+      const val = document.getElementById(`stat${i}`).value;
+      if (val) selectedValues.push(val);
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const statSelect = document.getElementById(`stat${i}`);
+      const currentValue = statSelect.value;
+
+      statSelect.innerHTML = '';
+
+      subStats.forEach(stat => {
+        if (stat.value === '') {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = stat.label;
+          statSelect.appendChild(opt);
+        } else if (stat.value === currentValue || !selectedValues.includes(stat.value)) {
+          const opt = document.createElement('option');
+          opt.value = stat.value;
+          opt.textContent = stat.label;
+          statSelect.appendChild(opt);
+        }
+      });
+
+      statSelect.value = currentValue || '';
+    }
+  }
+
+  function updateScoreOptions(i) {
+    const stat = document.getElementById(`stat${i}`).value;
+    const scoreSelect = document.getElementById(`score${i}`);
+    scoreSelect.innerHTML = '';
+
+    if (!stat || !rollValuesTable[stat]) {
+      const opt = document.createElement('option');
+      opt.value = '0';
+      opt.textContent = '0';
+      scoreSelect.appendChild(opt);
+      scoreSelect.disabled = true;
+      return;
+    }
+
+    scoreSelect.disabled = false;
+
+    const values = rollValuesTable[stat];
+    const combinations = [];
+
+    function combine(arr, depth, sum) {
+      if (depth === 0) {
+        combinations.push(sum);
+        return;
+      }
+      for (let val of arr) {
+        combine(arr, depth - 1, sum + val);
+      }
+    }
+
+    for (let rolls = 0; rolls <= 5; rolls++) {
+      combine(values, rolls, 0);
+    }
+
+    const unique = Array.from(new Set(combinations))
+      .sort((a, b) => a - b)
+      .map(v => (stat === 'em' ? Math.round(v) : (Math.round(v * 10) / 10).toFixed(1)));
+
+    unique.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      scoreSelect.appendChild(opt);
+    });
+  }
+
+  // 【変更済み】メイン値は計算に含めず、複合しないサブステは1回だけ加算
+  function calculateScore() {
+  let total = 0;
+
+  const noCompoundStat = document.getElementById('noCompoundStat').value;
+  let countedNoCompound = false;
+
+  for (let i = 1; i <= 4; i++) {
+    const stat = document.getElementById(`stat${i}`).value;
+    let val = parseFloat(document.getElementById(`score${i}`).value) || 0;
+
+    if (!stat) continue;
+
+    // 会心系の処理
+    if (stat === 'critRate') {
+      total += val * 2;
+    } else if (stat === 'critDmg') {
+      total += val;
+    }
+
+    // 参照スコア（攻撃%, HP%, etc.）は1回だけ加算
+    else if (stat === noCompoundStat && !countedNoCompound) {
+      total += val;
+      countedNoCompound = true;
+    }
+
+    // それ以外は加算しない（無視）
+  }
+
+  document.getElementById('result').textContent = `スコア: ${total.toFixed(1)}`;
+}
+
+
+  function init() {
+    const typeSelect = document.getElementById('artifactType');
+    ['flower', 'plume', 'sands', 'goblet', 'circlet'].forEach(t => {
+      const option = document.createElement('option');
+      option.value = t;
+      option.textContent = {
+        flower: '花',
+        plume: '羽',
+        sands: '時計',
+        goblet: '杯',
+        circlet: '冠'
+      }[t];
+      typeSelect.appendChild(option);
+    });
+
+    typeSelect.addEventListener('change', updateMainStatOptions);
+    document.getElementById('mainStat').addEventListener('change', updateMainValue);
+
+    updateMainStatOptions();
+    setupSubStatRows();
+  }
+
+  window.onload = init;
+</script>
+</body>
+
+</html>

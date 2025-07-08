@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>キャラ紹介サイト</title>
+  <link rel="stylesheet" href="style2.css" />
+  <style>
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .filters label {
+      font-weight: bold;
+      color: #6a4e2f;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+
+<body class="mondstadt">
+  <div class="filters">
+    <label>地域:
+      <select id="regionSelect">
+        <option value="all">すべて</option>
+        <option value="mondstadt">モンド</option>
+        <option value="liyue">璃月</option>
+        <option value="inazuma">稲妻</option>
+        <option value="sumeru">スメール</option>
+        <option value="fontaine">フォンテーヌ</option>
+        <option value="natlan">ナタ</option>
+        <option value="others">その他</option>
+      </select>
+    </label>
+
+    <label>元素:
+      <select id="elementSelect">
+        <option value="all">すべて</option>
+        <option value="炎元素">炎元素</option>
+        <option value="水元素">水元素</option>
+        <option value="風元素">風元素</option>
+        <option value="雷元素">雷元素</option>
+        <option value="氷元素">氷元素</option>
+        <option value="岩元素">岩元素</option>
+        <option value="草元素">草元素</option>
+      </select>
+    </label>
+
+    <label>武器:
+      <select id="weaponSelect">
+        <option value="all">すべて</option>
+        <option value="片手剣">片手剣</option>
+        <option value="両手剣">両手剣</option>
+        <option value="長柄武器">長柄武器</option>
+        <option value="弓">弓</option>
+        <option value="法具">法具</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="character-slider" id="characterSlider"></div>
+  <div id="characterContainer"></div>
+
+  <script>
+    const characters = {
+    mondstadt: [
+        { id: "venti", name: "ウェンティ", element: "風元素", weapon: "弓", desc: "風を司るモンドの詩人。その正体は自由の神バルバトス。", img: "img/ウェンティ.png" },
+        { id: "jean", name: "ジン", element: "風元素", weapon: "片手剣", desc: "正直で真面目な蒲公英騎士。モンド西風騎士団の代理団長。", img: "img/ジン.png" },
+        { id: "diluc", name: "ディルック", element: "炎元素", weapon: "両手剣", desc: "モンドの大半の酒造を掌握する貴公子。財力も人望も実力も、見くびってはならない。", img: "img/ディルック.png" },
+        { id: "amber", name: "アンバー", element: "炎元素", weapon: "弓", desc: "元気満々な女の子、騎士団で最も優秀で、最後の偵察騎士である。", img: "img/アンバー.png" },
+        { id: "kaeya", name: "ガイア", element: "氷元素", weapon: "片手剣", desc: "異国の顔を持つ剣士。西風騎士団の頭脳派である。", img: "img/ガイア.png" },
+        { id: "sucrose", name: "スクロース", element: "風元素", weapon: "法器", desc: "この世界のありとあらゆるものに強い好奇心を抱く錬金術師。研究分野は「生物錬金」。", img: "img/スクロース.png" },
+        { id: "mona", name: "モナ", element: "水元素", weapon: "法器", desc: "謎の占星術師の少女。自分のことを「偉大なる占星術師モナ」と自称するが、その肩書きに相応しい実力を持っている。博学で、高慢。", img: "img/モナ.png" },
+        { id: "rosaria", name: "ロサリア", element: "氷元素", weapon: "長柄武器", desc: "身にまとう服装以外、何ひとつとして聖職者とは思えないシスター。冷たい言動の中には、相手を見透かす鋭さが隠されている。また、いつも一人で行動をしている。", img: "img/ロサリア.png" },
+        { id: "bennett", name: "ベネット", element: "炎元素", weapon: "片手剣", desc: "モンドの少年冒険者。その優しさにそぐわない不運の持ち主。", img: "img/ベネット.png" },
+        { id: "diona", name: "ディオナ", element: "氷元素", weapon: "弓", desc: "稀な「非人類」の血統を引いている少女、「キャッツテール」の超人気バーテンダー。", img: "img/ディオナ.png" },
+        { id: "albedo", name: "アルベド", element: "岩元素", weapon: "片手剣", desc: "西風騎士団の首席錬金術師兼調査小隊隊長。「白亜の申し子」と呼ばれる天才。", img: "img/アルベド.png" },
+        { id: "noelle", name: "ノエル", element: "岩元素", weapon: "両手剣", desc: "「西風騎士団」の頼もしいメイド。いつか本当の騎士になることを夢見ている。", img: "img/ノエル.png" },
+        { id: "eula", name: "エウルア", element: "氷元素", weapon: "両手剣", desc: "古き一族出身の「波花騎士」。同時に西風騎士団の遊撃小隊隊長でもある。旧貴族の末裔でありながら、敵対関係にある西風騎士団に入団した理由は、未だ謎に包まれている。", img: "img/エウルア.png" },
+        { id: "klee", name: "クレー", element: "炎元素", weapon: "法器", desc: "西風騎士団反省室の常連で、モンドの爆破スペシャリスト。人呼んで「逃げ回る太陽」。", img: "img/クレー.png" },
+        { id: "razor", name: "レザー", element: "雷元素", weapon: "両手剣", desc: "人間の町から離れた、モンド地域の奔狼領で狼と暮らす少年。勘が鋭く、動きが俊敏。", img: "img/レザー.png" },
+        { id: "mika", name: "ミカ", element: "氷元素", weapon: "長柄武器", desc: "平凡な家庭に生まれた若い騎士。小隊では「前進測量士」を担当している。控えめで慎重な性格の持ち主。", img: "img/ミカ.png" },
+        { id: "dahlia", name: "ダリア", element: "水元素", weapon: "片手剣", desc: "西風教会の助祭にして、教会における風神の代理人。", img: "img/ダリア.png" }
+      ],
+
+      liyue: [
+        { id: "zhongli", name: "鍾離", element: "岩元素", weapon: "長柄武器", desc: "「往生堂」に招かれた謎の客卿。博識であり、あらゆることに精通している。", img: "img/鍾離.png" },
+        { id: "ganyu", name: "甘雨", element: "氷元素", weapon: "弓", desc: "月海亭の秘書。その身には仙獣「麒麟」の血が流れている。", img: "img/甘雨.png" },
+        { id: "hutao", name: "胡桃", element: "炎元素", weapon: "長柄武器", desc: "「往生堂」七十七代目堂主。若くして璃月のを仕切り、責任を持ってそれを執り行っている。", img: "img/胡桃.png" },
+        { id: "xingqiu", name: "行秋", element: "水元素", weapon: "片手剣", desc: "よく本売り場で見かける少年。手には剣を、胸の中には義侠心を。", img: "img/行秋.png" },
+        { id: "xiangling", name: "香菱", element: "炎元素", weapon: "長柄武器", desc: "璃月出身で少し有名な料理人。料理に対して情熱があり、激辛料理が大の得意。", img: "img/香菱.png" },
+        { id: "xiao", name: "魈", element: "風元素", weapon: "長柄武器", desc: "璃月を守る仙人・「夜叉」。またの名を「降魔大聖」、「夜叉大将」。", img: "img/魈.png" },
+        { id: "yanfei", name: "煙緋", element: "炎元素", weapon: "法器", desc: "仙獣の血が流れる聡明な少女。璃月港で有名な法律家として活躍している。", img: "img/煙緋.png" },
+        { id: "qiqi", name: "七七", element: "氷元素", weapon: "片手剣", desc: "薬舗「不卜廬」の薬採り兼弟子、紙のように白い顔色で不死身。口数が少なく、あまり表情がない。", img: "img/七七.png" },
+        { id: "baizhu", name: "白朮", element: "草元素", weapon: "法器", desc: "薬舗「不卜廬」の店主。「長生」という名の白蛇を体に乗せている。薬に精通しており、いつも深く考えを巡らせているが、他人が彼の思考を読み取ることは難しい。", img: "img/白朮.png" },
+        { id: "yaoyao", name: "ヨォーヨ", element: "草元素", weapon: "長柄武器", desc: "歌塵浪市真君のもっとも幼い弟子。優しくて思いやりのある「おませさん」。", img: "img/ヨォーヨ.png" },
+        { id: "beidou", name: "北斗", element: "雷元素", weapon: "両手剣", desc: "武装船隊「南十字」の頭領。豪快な姉貴。", img: "img/北斗.png" },
+        { id: "ningguang", name: "凝光", element: "岩元素", weapon: "法器", desc: "「璃月七星」の一人、「天権」。富の多さで有名であり、全大陸で彼女に匹敵する者はまずいない。", img: "img/凝光.png" },
+        { id: "chongyun", name: "重雲", element: "氷元素", weapon: "両手剣", desc: "妖魔退治一族の方士少年、自身の「純陽の体」を抑えるためにいろいろ苦労している。", img: "img/重雲.png" },
+        { id: "yelan", name: "夜蘭", element: "水元素", weapon: "弓", desc: "総務司所属を称する謎の人物。しかし、総務司の名簿上では「存在しない人」となっている。", img: "img/夜蘭.png" },
+        { id: "shenhe", name: "申鶴", element: "氷元素", weapon: "長柄武器", desc: "仙人の弟子であり、気品溢れる女性。璃月の山奥にひっそりと住み、その気質は仙人のように孤独で淡々としている。", img: "img/申鶴.png" },
+        { id: "xianyun", name: "閑雲", element: "風元素", weapon: "法器", desc: "絶雲仙衆「三眼五顕仙人」の一人。尊称は「留雲借風真君」。仕掛けの術に長けており、俗世の人の営みに思いを寄せている。現在は「閑雲」という名で人の世を渡り歩いている。", img: "img/閑雲.png" },
+        { id: "lanxian", name: "藍硯", element: "風元素", weapon: "法器", desc: "沈玉の谷出身の籐編み職人。端正な面持ちがすっきりとした印象を与える、泉のように瑞々しい少女。", img: "img/藍硯.png" },
+        { id: "keqing", name: "刻晴", element: "雷元素", weapon: "片手剣", desc: "「璃月七星」の一人、「玉衡」。「帝君の一言で決まる璃月」に不満を持っている——だが実のところ、神は彼女のような者を高く評価している。", img: "img/刻晴.png" },
+        { id: "yunjin", name: "雲菫", element: "岩元素", weapon: "長柄武器", desc: "演技と創作の二つの才を持つ璃月劇の看板役者。雲菫の演じる姿は優雅でたおやかであり、まるで彼女の風格を表しているかのようである。", img: "img/雲菫.png" },
+        { id: "gaming", name: "嘉明", element: "炎元素", weapon: "両手剣", desc: "剣鞘鏢局の鏢師であり、威水獣舞隊の責任者。", img: "img/嘉明.png" },
+        { id: "Xinyan", name: "辛炎", element: "炎元素", weapon: "両手剣", desc: "璃月港唯一のロックミュージシャン。音楽と情熱で「先入観」への反抗を歌う。", img: "img/辛炎.png" }
+      ],
+
+      inazuma: [
+        { id: "raiden", name: "雷電将軍", element: "雷元素", weapon: "長柄武器", desc: "御建鳴神主尊大御所様。永劫不変の「永遠」を稲妻の民に約束する。", img: "img/雷電将軍.png" },
+        { id: "ayaka", name: "神里綾華", element: "氷元素", weapon: "片手剣", desc: "稲妻「社奉行」神里家の令嬢。容姿端麗で品行方正な人物。", img: "img/神里綾華.png" },
+        { id: "kazuha", name: "楓原万葉", element: "風元素", weapon: "片手剣", desc: "稲妻より訪れし浪人。今は璃月の「南十字」武装船隊と行動を共にしている。穏やかで浮世離れした性格だが、過去に経験した様々な出来事を心の内に秘めている。", img: "img/楓原万葉.png" },
+        { id: "yoimiya", name: "宵宮", element: "炎元素", weapon: "弓", desc: "「長野原花火屋」の店主。才ある花火職人で、人々の願いを花火へと託す。「夏祭りの女王」と呼ばれている。", img: "img/宵宮.png" },
+        { id: "thoma", name: "トーマ", element: "炎元素", weapon: "長柄武器", desc: "神里家の家司。稲妻で活躍する「顔役」でもある。", img: "img/トーマ.png" },
+        { id: "ayato", name: "神里綾人", element: "水元素", weapon: "片手剣", desc: "若く有能な社奉行神里家の現当主。穏やかで礼儀正しく、物事をそつなく処理する。", img: "img/神里綾人.png" },
+        { id: "itto", name: "荒瀧一斗", element: "岩元素", weapon: "両手剣", desc: "稲妻城の花見坂で活動する「荒瀧派」の初代親分。なにっ！？荒瀧派なんて聞いたこともないだと？喧嘩売ってんのか、コラァ！？", img: "img/荒瀧一斗.png" },
+        { id: "gorou", name: "ゴロー", element: "岩元素", weapon: "弓", desc: "海祇島軍隊の大将で、部下から厚く信頼されている。", img: "img/ゴロー.png" },
+        { id: "kirara", name: "綺良々", element: "草元素", weapon: "片手剣", desc: "稲妻の配達会社「狛荷屋」の配達員。仕事を愛し、人間社会に憧れている「猫又」。", img: "img/綺良々.png" },
+        { id: "sara", name: "九条裟羅", element: "雷元素", weapon: "弓", desc: "「天領奉行」の大将。果敢かつ勇猛である。", img: "img/九条裟羅.png" },
+        { id: "kokomi", name: "珊瑚宮心海", element: "水元素", weapon: "法器", desc: "海祇島の「現人神の巫女」、海祇島すべての事務を担当している少女。", img: "img/珊瑚宮心海.png" },
+        { id: "sayu", name: "早柚", element: "風元素", weapon: "片手剣", desc: "「終末番」に所属する忍。小柄で、いつも眠たそうにしている。", img: "img/早柚.png" },
+        { id: "heizou", name: "鹿野院平蔵", element: "風元素", weapon: "法器", desc: "天領奉行の天才少年探偵。直感が鋭く、洞察力に優れている。", img: "img/鹿野院平蔵.png" },
+        { id: "chiori", name: "千織", element: "岩元素", weapon: "片手剣", desc: "「千織屋」店主。フォンテーヌの有名なファッションデザイナー。", img: "img/千織.png" },
+        { id: "shinobu", name: "久岐忍", element: "雷元素", weapon: "片手剣", desc: "有能で信頼できる「荒瀧派」の二番手——注：「有能」と「信頼できる」は「荒瀧派」ではなく、二番手のことを表している。", img: "img/久岐忍.png" },
+        { id: "yae", name: "八重神子", element: "雷元素", weapon: "法器", desc: "の様であり、「」の編集長。華やかな見た目の裏には、思いもよらぬ知性と奸智が隠されている。", img: "img/八重神子.png" },
+        { id: "mizuki", name: "夢見月瑞希", element: "風元素", weapon: "法器", desc: "「秋沙銭湯」の大株主で、夢喰い獏の心理療法士。人々の悪夢を追い払って安らぎを与えるために奮闘している。", img: "img/夢見月瑞希.png" }
+      ],
+
+      sumeru: [
+        { id: "nahida", name: "ナヒーダ", element: "草元素", weapon: "法具", desc: "スラサタンナ聖処に幽棲する籠の中の鳥。夢の中でしか世界を眺めることができない。", img: "img/ナヒーダ.png" },
+        { id: "alhaitham", name: "アルハイゼン", element: "草元素", weapon: "片手剣", desc: "スメール教令院の現書記官。並外れた知恵と才能の持ち主。悠々自適の生活を送っており、人に行方を知られることは滅多にない。", img: "img/アルハイゼン.png" },
+        { id: "tighnari", name: "ティナリ", element: "草元素", weapon: "弓", desc: "植物学に精通している若き学者、アビディアの森のレンジャー長を務めている。まっすぐな性格で熱意があり、考えなしに行動してしまう者を指導するのが得意。", img: "img/ティナリ.png" },
+        { id: "collei", name: "コレイ", element: "草元素", weapon: "弓", desc: "アビディアの森で活躍する見習いレンジャー。親切な言動の裏には、少し内向的な性格が隠されている。", img: "img/コレイ.png" },
+        { id: "cyno", name: "セノ", element: "雷元素", weapon: "長柄武器", desc: "教令院の学者たちを監督する「大マハマトラ」。クシャレワー学院が作った『大マッハマシン』よりも効率よく仕事をこなす。", img: "img/セノ.png" },
+        { id: "kaveh", name: "カーヴェ", element: "草元素", weapon: "両手剣", desc: "スメールの著名建築デザイナー。多くの物事に対し、行き過ぎた思いやりの心を持つ。唯美主義者だが、現実に悩まされている。", img: "img/カーヴェ.png" },
+        { id: "dori", name: "ドリー", element: "雷元素", weapon: "法具", desc: "神出鬼没の旅商人。一番好きなものは、キラキラと輝くモラ。", img: "img/ドリー.png" },
+        { id: "layla", name: "レイラ", element: "氷元素", weapon: "片手剣", desc: "理論占星学を専攻するルタワヒスト学院の学生。時々夢遊状態になる。寝不足が長期にわたり続いており、睡眠障害に悩まされている。", img: "img/レイラ.png" },
+        { id: "faruzan", name: "ファルザン", element: "風元素", weapon: "弓", desc: "「百年前」から訪れた学者。自ら好んで先輩と名乗り、各種古代文字や古典ギミックに精通している。", img: "img/ファルザン.png" },
+        { id: "candace", name: "キャンディス", element: "水元素", weapon: "長柄武器", desc: "琥珀色の左目を持つ、キングデシェレトの末裔。アアル村のガーディアンをしている。", img: "img/キャンディス.png" },
+        { id: "dehya", name: "ディシア", element: "炎元素", weapon: "両手剣", desc: "スメールの砂漠を気の赴くままに渡り歩く傭兵集団「エルマイト旅団」のメンバー。屈強で勇敢な戦士。「エルマイト旅団」ではかなり名が通っている。", img: "img/ディシア.png" },
+        { id: "nilou", name: "ニィロウ", element: "水元素", weapon: "片手剣", desc: "「ズバイルシアター」の噂に名高い踊り子。そのダンスはしなやかで美しく、彼女自身も優しく純粋な心で人と接する。", img: "img/ニィロウ.png" },
+        { id: "wanderer", name: "放浪者", element: "風元素", weapon: "法器", desc: "正体が謎に包まれた放浪者。修験者のような身なりをしているが、それらしき言動は見られない。", img: "img/放浪者.png" },
+        { id: "sethos", name: "セトス", element: "雷元素", weapon: "弓", desc: "沈黙の殿の継承者。砂漠より訪れ、秘密を背負っている。", img: "img/セトス.png" }
+      ],
+
+
+      fontaine: [
+        { id: "furina", name: "フリーナ", element: "水元素", weapon: "片手剣", desc: "審判の舞台で、誰よりもスポットライトを浴びる存在——拍手が鳴り響き、その幕が閉じられるまで。", img: "img/フリーナ.png" },
+        { id: "neuvillette", name: "ヌヴィレット", element: "水元素", weapon: "法器", desc: "フォンテーヌの最高審判官。一分の隙もない「公正無私」な振る舞いで名高い。", img: "img/ヌヴィレット.png" },
+        { id: "clorinde", name: "クロリンデ", element: "雷元素", weapon: "片手剣", desc: "その手に握る剣でフォンテーヌ廷の「正義」を守る、無敗の決闘代理人。", img: "img/クロリンデ.png" },
+        { id: "charlotte", name: "シャルロット", element: "氷元素", weapon: "法器", desc: "元気に満ち溢れるスチームバード新聞の記者。いつも「真相」を求めて駆け回っている。", img: "img/シャルロット.png" },
+        { id: "lyney", name: "リネ", element: "炎元素", weapon: "弓", desc: "話術に長け、優れた表現力を持つフォンテーヌの名高い魔術師。巧妙な手品と言葉で観客たちの心を動かす。", img: "img/リネ.png" },
+        { id: "lynette", name: "リネット", element: "風元素", weapon: "片手剣", desc: "口数が少なく、表情に乏しいマジックアシスタント。その性格は猫のようにつかみどころがない。", img: "img/リネット.png" },
+        { id: "freminet", name: "フレミネ", element: "氷元素", weapon: "両手剣", desc: "潜水の道を極めた寡黙な少年。氷のように近づきがたい外見の下に、一点の瑕もない純粋な心を秘めている。", img: "img/フレミネ.png" },
+        { id: "navia", name: "ナヴィア", element: "岩元素", weapon: "両手剣", desc: "棘薔薇の会の現会長。愛らしく、強い責任感を持った素晴らしいボス。", img: "img/ナヴィア.png" },
+        { id: "wriothesley", name: "リオセスリ", element: "氷元素", weapon: "法器", desc: "メロピデ要塞の公爵。漆黒の海底に潜む領主。", img: "img/リオセスリ.png" },
+        { id: "chevreuse", name: "シュヴルーズ", element: "炎元素", weapon: "長柄武器", desc: "心の中にある「正義」を常に遵守する特巡隊隊長。その手にある銃は罪人だけに向けられる。", img: "img/シュヴルーズ.png" },
+        { id: "sigewinne", name: "シグウィン", element: "水元素", weapon: "弓", desc: "メロピデ要塞のメリュジーヌ看護師長。海底監獄の罪人たちを平等に思いやっている。", img: "img/シグウィン.png" },
+        { id: "escoffier", name: "エスコフィエ", element: "氷元素", weapon: "長柄武器", desc: "フォンテーヌに名を馳せる「元ホテル・ドゥボールのシェフ」。「カーネル・デセール」の肩書きを持つ「科学料理」の先駆者でもある。料理に関する要求が非常に高い。", img: "img/エスコフィエ.png" },
+        { id: "Emilie", name: "エミリエ", element: "草元素", weapon: "長柄武器", desc: "秘密を瓶の中に隠す、フォンテーヌの調香師。", img: "img/エミリエ.png" }
+      ],
+
+      natlan: [
+        { id: "mualani", name: "ムアラニ", element: "水元素", weapon: "法器", desc: "ナタ中に名を馳せるガイドであり、マリングッズ店の経営者でもある、さまざまな水上スポーツに精通した波追い人。", img: "img/ムアラニ.png" },
+        { id: "kinich", name: "キィニチ", element: "草元素", weapon: "両手剣", desc: "ウィッツトランの竜狩り人。代償を量ることに長けている。", img: "img/キィニチ.png" },
+        { id: "kachina", name: "カチーナ", element: "岩元素", weapon: "長柄武器", desc: "古名「ウッサビーティ」を授かったナナツカヤンの若き戦士。挫折の中で成長し続ける、善良で粘り強い少女。", img: "img/カチーナ.png" },
+        { id: "xilonen", name: "シロネン", element: "岩元素", weapon: "片手剣", desc: "ナナツカヤンの名鋳り師。山積みの仕事と快適な暮らしのバランスを取るのが得意。", img: "img/シロネン.png" },
+        { id: "chasca", name: "チャスカ", element: "風元素", weapon: "弓", desc: "トラロカンの「調停者」。幾千万の争いを終結させる者。", img: "img/チャスカ.png" },
+        { id: "ororon", name: "オロルン", element: "雷元素", weapon: "弓", desc: "謎煙の主出身だが、無数の命と共に、集落の外で生きる若者。", img: "img/オロルン.png" },
+        { id: "citlali", name: "シトラり", element: "氷元素", weapon: "法器", desc: "謎煙の主の大シャーマン。一族の誰もが敬う「黒曜石の老婆」。", img: "img/シトラり.png" },
+        { id: "mavuika", name: "マーヴィカ", element: "炎元素", weapon: "両手剣", desc: "「キオンゴズィ」の古名を受け継いだナタの指導者。聖火で戦争の国を照らせることを願っている。", img: "img/マーヴィカ.png" },
+        { id: "iansan", name: "イアンサ", element: "雷元素", weapon: "長柄武器", desc: "「豊穣の邦」トレーニングジムのトレーナー。ナタの有名な栄養士。", img: "img/イアンサ.png" },
+        { id: "valesa", name: "ヴァレサ", element: "雷元素", weapon: "法器", desc: "のんびりまったりした「豊穣の邦」の戦士で、果樹園のお世話係。強い英雄に憧れており、食べることが大好き。", img: "img/ヴァレサ.png" },
+        { id: "Ifa", name: "イファ", element: "風元素", weapon: "法器", desc: "花翼の集の竜医。人や動物、その他の生き物と共に過ごす生活を心から愛している。", img: "img/イファ.png" }
+      ],
+
+      others: [
+        { id: "dainsleif", name: "ダインスレイヴ", element: "？？？", weapon: "片手剣", desc: "カーンルイアの末裔である『不死なる黄昏の剣』。深い謎に包まれた旅人の協力者。", img: "img/ダインスレイヴ.png" },
+        { id: "aloy", name: "アーロイ", element: "氷元素", weapon: "弓", desc: "かつては異端者であったが、今は機敏で腕の立つ狩人。いついかなる時も、正確無比な矢を放つことができる。", img: "img/アーロイ.png" },
+        { id: "skirk", name: "スカーク", element: "？？？", weapon: "片手剣", desc: "かつて深淵の裂け目や原始胎海に足を踏み入れた来訪者であり、タルタリヤに武芸を仕込んだ師。孤独に戦う。", img: "img/スカーク.png" }
+      ],
+    };
+
+    let currentCharacters = [];
+    let activeId = null;
+
+    function filterCharacters() {
+      const region = document.getElementById("regionSelect").value;
+      const element = document.getElementById("elementSelect").value;
+      const weapon = document.getElementById("weaponSelect").value;
+
+      document.body.className = region !== "all" ? region : "default";
+
+      currentCharacters = [];
+
+      Object.entries(characters).forEach(([r, charList]) => {
+        if (region === "all" || region === r) {
+          charList.forEach(char => {
+            if ((element === "all" || char.element === element) &&
+                (weapon === "all" || char.weapon === weapon)) {
+              currentCharacters.push({ ...char, region: r });
+            }
+          });
+        }
+      });
+
+      renderCharacterSlider();
+      if (currentCharacters.length > 0) {
+        showCharacter(currentCharacters[0].id);
+      } else {
+        document.getElementById("characterContainer").innerHTML = "<p style='text-align:center;'>該当キャラがいません</p>";
+      }
+    }
+
+    function renderCharacterSlider() {
+      const slider = document.getElementById("characterSlider");
+      slider.innerHTML = "";
+
+      currentCharacters.forEach(char => {
+        const button = document.createElement("button");
+        button.className = char.id === activeId ? "active" : "";
+        button.innerHTML = `<img src="${char.img}" alt="${char.name}">`;
+        button.addEventListener("click", () => showCharacter(char.id));
+        slider.appendChild(button);
+      });
+    }
+
+    function showCharacter(id) {
+      const char = currentCharacters.find(c => c.id === id);
+      if (!char) return;
+
+      activeId = id;
+      renderCharacterSlider();
+
+      const container = document.getElementById("characterContainer");
+      container.innerHTML = `
+        <section class="character">
+          <img src="${char.img}" alt="${char.name}" />
+          <div class="character-info">
+            <h2>${char.name}</h2>
+            <p>${char.element} / ${char.weapon}</p>
+            <p>${char.desc}</p>
+          </div>
+        </section>
+      `;
+    }
+
+    document.getElementById("regionSelect").addEventListener("change", filterCharacters);
+    document.getElementById("elementSelect").addEventListener("change", filterCharacters);
+    document.getElementById("weaponSelect").addEventListener("change", filterCharacters);
+
+    filterCharacters(); // 初期実行
+  </script>
+</body>
+</html>

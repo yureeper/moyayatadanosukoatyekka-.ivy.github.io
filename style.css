@@ -1,0 +1,85 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5efe6;
+  color: #333;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #c0a060;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #6a4e2f;
+}
+
+label {
+  display: block;
+  margin: 10px 0 5px;
+}
+
+select, input[type=number] {
+  font-size: 1rem;
+  padding: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #c9a96e;
+  border-radius: 5px;
+  background-color: #fffaf2;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #c9a96e;
+  padding: 8px;
+  text-align: center;
+}
+
+button {
+  display: block;
+  margin: 20px auto;
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #e9d7aa;
+  border: 2px solid #bfa76f;
+  border-radius: 8px;
+}
+
+button:hover {
+  background-color: #f5e7c4;
+}
+
+#result {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.3rem;
+  margin-top: 20px;
+}
+
+/* 追加部分：部位選択と複合しないサブステ選択の横並び */
+.compact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.compact-row label {
+  display: inline-block;
+  margin: 0;
+  min-width: 110px;
+  color: #6a4e2f;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+

@@ -1,0 +1,84 @@
+body, html {
+  font-family: 'Noto Serif JP', 'Playfair Display', serif;
+  background-color: #f5efe6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.header {
+  background-color: #fff3d6;
+  padding: 20px;
+  border-bottom: 2px solid #d4af37;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header .logo {
+  font-size: 1.4em;
+  color: #75452d;
+  font-weight: bold;
+}
+
+.nav {
+  display: flex;
+  gap: 15px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #6a4e2f;
+  background-color: #f0e0b0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #c9a96e;
+  transition: background-color 0.3s ease;
+}
+
+.nav a:hover {
+  background-color: #f5e7c4;
+}
+
+.welcome-box {
+  max-width: 600px;
+  margin: 20px auto 40px;
+  padding: 40px 30px;
+  background-image: url('img/home.png');
+  background-size: 150% 150%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #d4af37;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #c0a060;
+  text-align: center;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+
+  /* テキストの縁取り風シャドウ */
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}
+
+
+button:hover {
+  background-color: #f5e7c4;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+}

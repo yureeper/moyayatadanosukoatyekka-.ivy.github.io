@@ -1,0 +1,158 @@
+/* 地域切替ボタン */
+.region-buttons {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.region-buttons button {
+  background-color: #fffaf2;
+  border: 2px solid #c9a96e;
+  border-radius: 10px;
+  padding: 8px 18px;
+  margin: 0 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #6a4e2f;
+  box-shadow: 0 2px 5px rgba(196,166,94,0.4);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+  font-size: 1rem;
+}
+
+.region-buttons button:hover {
+  background-color: #d4af37;
+  color: white;
+  border-color: #bfa76f;
+  box-shadow: 0 4px 12px rgba(196,166,94,0.7);
+}
+
+.region-buttons button.active {
+  background-color: #d4af37;
+  color: white;
+  border-color: #bfa76f;
+  box-shadow: 0 4px 12px rgba(196,166,94,0.8);
+}
+
+/* キャラスライダーのボタン */
+.character-slider button {
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 6px #c9a96e;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fffaf2;
+}
+
+.character-slider button.active {
+  transform: scale(1.15);
+  box-shadow: 0 0 15px #d4af37;
+  background-color: #f9f1d3;
+}
+
+.character-slider button img {
+  border: 2px solid #c9a96e;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.character-slider button.active img {
+  border-color: #bfa76f;
+  transform: scale(1.1);
+}
+
+/* キャラ詳細表示 */
+#characterContainer section.character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #fffaf2;
+  border-radius: 14px;
+  padding: 20px 30px;
+  border: 2px solid #d4af37;
+  box-shadow: 0 0 10px #c0a060;
+  max-width: 480px;
+  margin: 0 auto 40px auto;
+}
+
+#characterContainer section.character img {
+  width: 200px;
+  height: auto;
+  border-radius: 12px;
+  border: 2px solid #d4af37;
+  margin-bottom: 15px;
+}
+
+#characterContainer section.character .character-info h2 {
+  margin: 10px 0 5px;
+  font-size: 1.6rem;
+  color: #6a4e2f;
+  font-weight: bold;
+}
+
+#characterContainer section.character .character-info p {
+  margin: 4px 0;
+  font-size: 1.05rem;
+  color: #4b3a1b;
+  line-height: 1.4;
+}
+
+body.mondstadt {
+  background-color: #f5efe6;
+  background-image: url('img/モンド.png');
+  background-size: cover;
+  background-position: center;
+  color: #333;
+}
+
+body.liyue {
+  background-color: #e6f0f8;
+  background-image: url('img/璃月.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+body.inazuma {
+  background-color: #f0e6e6;
+  background-image: url('img/稲妻.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+body.sumeru {
+  background-color: #f0e6e6;
+  background-image: url('img/スメール.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+body.fontaine {
+  background-color: #f0e6e6;
+  background-image: url('img/フォンテーヌ.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+body.natlan {
+  background-color: #f0e6e6;
+  background-image: url('img/ナタ.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+body.others {
+  background-color: #f0e6e6;
+  background-image: url('img/その他.png');
+  background-size: cover;
+  background-position: center;
+  color: #2f2f2f;
+}
+
+/* ここに前回のstyle2.css全体の内容を統合してください */
+
